@@ -62,7 +62,7 @@ if( $infile )
 
     my $temp_outfile_name = $outfile;
 
-    $outfile = ">". $path . substr($temp_outfile_name,0,40) . ".fas";
+    $outfile = ">". $path . substr($temp_outfile_name,0,40); # . ".fas";
     open(OUTPUT,$outfile) || die "Can't open the output file $outfile: $! \n";
 }
 
@@ -285,7 +285,7 @@ my $garbage = <INFILE>;
                 print OUTPUT "$line\n";
                 print OUTPUT "$temp_query_id\n$exon_hash{$temp_query_id}\n";
                 print OUTPUT "$temp_subject_id\n$exon_hash{$temp_subject_id}\n";
-                print OUTPUT "\\\\\n";
+                print OUTPUT "\\\\NEW BLAST PAIR\n";
 
                 $number_orthologs++;
             }
@@ -365,7 +365,7 @@ local $/ = $old_record_separator;
 
 
 print "\nWe parsed $loop_counter records!!\n";
-print "Wrote $number_orthologs putative Single Copy exons to file.\n";
+print "Wrote $number_orthologs putative Orthologous Exon Sequences to file.\n";
 
 close (INFILE);
 close (OUTPUT);

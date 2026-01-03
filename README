@@ -1,0 +1,237 @@
+
+    Dr. Guoqing Lu's Molecular Marker Locator Project.
+
+Fred Potmesil
+August 29, 2005.
+
+
+Currently, there are several steps done to locate putative molecular markers.
+For purposes of this readme, I will use the initial Zebra and Fugu fish species to
+illustrate how the the molecular markers for Fugu and Zebra were located.
+We downloaded genbank formatted exon files for both Fugu (Fugu_rubripes) 
+and Zebra (Danio_rerio) from the Ensemble website.  The perl scripts that I 
+developed use the Bioperl modules, as well as a few other modules that are all
+publicly available.  
+
+#########################################################
+TO DO:  List modules used.....
+Error.pm
+
+#########################################################
+
+There are several files for both species' respective genomes; the files 
+are all 'tarred' and 'gzipped'.  
+
+The file listing for Fugu is:
+rw-rw-r--  1 fred fred 7.6M Aug  4 22:07 Fugu_rubripes.0.dat.gz
+-rw-rw-r--  1 fred fred 6.4M Aug  4 21:51 Fugu_rubripes.10000.dat.gz
+-rw-rw-r--  1 fred fred 6.7M Aug  4 22:03 Fugu_rubripes.1000.dat.gz
+-rw-rw-r--  1 fred fred 6.2M Aug  4 21:45 Fugu_rubripes.11000.dat.gz
+-rw-rw-r--  1 fred fred 4.7M Aug  4 21:58 Fugu_rubripes.12000.dat.gz
+-rw-rw-r--  1 fred fred  13M Aug  4 21:36 Fugu_rubripes.13000.dat.gz
+-rw-rw-r--  1 fred fred  14M Aug  4 21:41 Fugu_rubripes.14000.dat.gz
+-rw-rw-r--  1 fred fred  11M Aug  4 21:56 Fugu_rubripes.15000.dat.gz
+-rw-rw-r--  1 fred fred 9.3M Aug  4 21:53 Fugu_rubripes.16000.dat.gz
+-rw-rw-r--  1 fred fred 8.3M Aug  4 22:09 Fugu_rubripes.17000.dat.gz
+-rw-rw-r--  1 fred fred 7.8M Aug  4 21:44 Fugu_rubripes.18000.dat.gz
+-rw-rw-r--  1 fred fred 6.9M Aug  4 21:31 Fugu_rubripes.19000.dat.gz
+-rw-rw-r--  1 fred fred 2.6M Aug  4 22:05 Fugu_rubripes.20000.dat.gz
+-rw-rw-r--  1 fred fred 6.5M Aug  4 21:47 Fugu_rubripes.2000.dat.gz
+-rw-rw-r--  1 fred fred 6.0M Aug  4 22:01 Fugu_rubripes.3000.dat.gz
+-rw-rw-r--  1 fred fred 5.8M Aug  4 21:33 Fugu_rubripes.4000.dat.gz
+-rw-rw-r--  1 fred fred 5.1M Aug  4 21:38 Fugu_rubripes.5000.dat.gz
+-rw-rw-r--  1 fred fred 5.1M Aug  4 22:04 Fugu_rubripes.6000.dat.gz
+-rw-rw-r--  1 fred fred 6.4M Aug  4 21:49 Fugu_rubripes.7000.dat.gz
+-rw-rw-r--  1 fred fred 5.8M Aug  4 22:11 Fugu_rubripes.8000.dat.gz
+-rw-rw-r--  1 fred fred 6.2M Aug  4 21:59 Fugu_rubripes.9000.dat.gz
+-rw-rw-r--  1 fred fred 3.0K Aug  4 21:29 README
+
+
+The file listing for Zebra is:
+-rw-rw-r--  1 fred fred 395M Aug  4 21:15 Danio_rerio.0.dat.gz
+-rw-rw-r--  1 fred fred 6.6M Aug  4 21:26 Danio_rerio.10000.dat.gz
+-rw-rw-r--  1 fred fred 136M Aug  4 19:11 Danio_rerio.1000.dat.gz
+-rw-rw-r--  1 fred fred 5.1M Aug  4 19:20 Danio_rerio.11000.dat.gz
+-rw-rw-r--  1 fred fred 6.5M Aug  4 18:32 Danio_rerio.12000.dat.gz
+-rw-rw-r--  1 fred fred 5.7M Aug  4 19:14 Danio_rerio.13000.dat.gz
+-rw-rw-r--  1 fred fred 6.4M Aug  4 19:13 Danio_rerio.14000.dat.gz
+-rw-rw-r--  1 fred fred 6.2M Aug  4 21:29 Danio_rerio.15000.dat.gz
+-rw-rw-r--  1 fred fred  32M Aug  4 21:24 Danio_rerio.16000.dat.gz
+-rw-rw-r--  1 fred fred 5.5M Aug  4 19:18 Danio_rerio.2000.dat.gz
+-rw-rw-r--  1 fred fred 6.3M Aug  4 19:26 Danio_rerio.3000.dat.gz
+-rw-rw-r--  1 fred fred 6.2M Aug  4 21:28 Danio_rerio.4000.dat.gz
+-rw-rw-r--  1 fred fred 6.1M Aug  4 19:24 Danio_rerio.5000.dat.gz
+-rw-rw-r--  1 fred fred 7.9M Aug  4 19:17 Danio_rerio.6000.dat.gz
+-rw-rw-r--  1 fred fred  10M Aug  4 18:30 Danio_rerio.7000.dat.gz
+-rw-rw-r--  1 fred fred  11M Aug  4 19:22 Danio_rerio.8000.dat.gz
+-rw-rw-r--  1 fred fred 5.8M Aug  4 18:33 Danio_rerio.9000.dat.gz
+-rw-rw-r--  1 fred fred 3.0K Aug  4 18:27 README
+
+
+For the first step, we chose to collect only the exons out of the genbank
+files.  A perl script was developed to parse the files, and extract exons 
+that met the criteria of having a length greater than 800.  This is a 
+dynamic parameter, the length is passed on the command line of the perl
+script.  The script 'extract_genbank_exons.pl' was used on the command line:
+"./extract_genbank_exons.pl --infiles_dir=Genbank_Data_Files/Zebra/ \
+--outfile=zebra_exons.fas --exon_size=800 --debug"
+
+Note that the input files directory must be listed with a trailing slash!!
+Yah, I need to fix this, but not a priority at the moment...sorry.  Input 
+files can also be passed individually, or passed individually in a plain
+(not tarred and gzipped) file format as well, the script handles all that
+pretty well, look at the code if interested.
+
+This command line will open the listed directory for input files in ".tar.gz"
+format, dynamically unzip each file in turn, and parse out the exons that are
+greater than 800 in length.  The debug flag prints out a debug file with lots 
+of information, including the total number of exons, the number of exons that 
+were skipped (too short), and any errors that were encountered during the run.
+It should be noted that there are some errors in the genbank input files that 
+cause Bioperl to terminate processing with fatal errors.  These errors can be 
+trapped and handled using Error.pm's very cool try/catch blocks, much in the 
+fashion of C++ and Java.
+
+Using the command and parameters above, these are the statistics for the
+Zebra genome:
+Overall Run Statistics:
+Number of Genes: 22899
+Total Number of Exons: 232293
+Exons with length > 800: 6746
+Exons with length < 800: 225547
+
+The command gives us the follwing zebra exons file:
+-rw-rw-r--  1 fred fred 9.0M Sep 10 15:29 zebra_exons.fas
+
+
+After the initial parsing of the Zebra species genbank files to extract the exons,
+we formatted a Blast database with the zebra exon file produced.  We then ran a 
+Blast search, using the same zebra exons file against the zebra exons database.
+The purpose of this is to locate 'Single-Copy Exons' out of the zebra genome.
+
+The Blast formatdb command follows next:
+[fred@snapper databases]$ formatdb -p F -i zebra_exons.fas -o T
+
+The files in the database directory are now:
+-rw-rw-r--  1 fred fred  304 Sep 10 15:33 formatdb.log
+-rw-rw-r--  1 fred fred 9.0M Sep 10 15:29 zebra_exons.fas
+-rw-rw-r--  1 fred fred 567K Sep 10 15:33 zebra_exons.fas.nhr
+-rw-rw-r--  1 fred fred  80K Sep 10 15:33 zebra_exons.fas.nin
+-rw-rw-r--  1 fred fred 803K Sep 10 15:33 zebra_exons.fas.nsd
+-rw-rw-r--  1 fred fred  15K Sep 10 15:33 zebra_exons.fas.nsi
+-rw-rw-r--  1 fred fred 2.2M Sep 10 15:33 zebra_exons.fas.nsq
+
+Now, we need to run a Blast search using the database we just created, and the 
+same zebra exons file as a query.  I might have the pendantic meaning of query and
+subject as it pertains to Blast databases mixed up here, but the essence is the 
+query and subject are the same exons.  This will theoretically allow us to determine
+which exons are 'Single-Copy'.
+
+The Blast search command is next:
+blastall -p blastn -d zebra_exons.fas -i zebra_exons.fas \ 
+-e 0.05 -F F -m 9 -o zebra_zebra_blast.out
+
+This results in the following file listing:
+-rw-rw-r--  1 fred fred  35M Sep 10 15:48 zebra_zebra_blast.out
+
+Note that the Blast parameters have an influence on the output file - in
+particular, the expect value, -e 0.05.  If this value is set to -e 5, there
+will be many more hits, and a much larger output file.  
+
+Next, we need to determine which zebra exons are 'Single-Copy'.  This is done 
+using the Blast output file we just produced, and the perl script
+'blast_parser.pl'.  The original exon file that was produced from 
+'extract_genbank_exons.pl' must be passed to the script as well
+so all the exons that are found can be listed in the output file.
+
+The command line I used is:
+"./blast_parser.pl --infile=databases/zebra_zebra_blast.out \
+--outfile=zebra_single_copy_exons.fas --exon_file=databases/zebra_exons.fas \
+--min_bit_score=100"
+
+This gives us some informative output:
+We parsed 6746 records!!
+Wrote 2797 putative Single Copy exons to file.
+
+The script run gives us the following output file:
+-rw-rw-r--  1 fred fred 3.6M Sep 10 15:56 zebra_single_copy_exons.fas
+
+Note that the parsing script currently only uses the Blast 'bit score' value
+to determine which exons are related.  The bit score is a Blast score that
+considers several factors and is a reliable indicator of relatedness.
+
+
+Now, we need to parse out the Fugu species exons from the genbank files.  This is
+done in the same fashion used for the Zebra genbank files.  The command line for 
+parsing out fugu exons is:
+"./extract_genbank_exons.pl --infiles_dir=Genbank_Data_Files/Fugu/ \
+--outfile=fugu_exons --exon_size=800 --debug"
+
+This script run results in the following informative output:
+Overall Run Statistics:
+Number of Genes: 22090
+Total Number of Exons: 225622
+Exons with length > 800: 3483
+Exons with length < 800: 222139
+
+The script results in the following file of fugu exons:
+-rw-rw-r--  1 fred fred 4.6M Sep 10 16:24 fugu_exons.fas
+
+Now, we need to run Blast to determine which Fugu exons are 'Single-Copy'.  This 
+is done the same way as we did for the Zebra...  First, we create the database:
+[fred@snapper databases]$ formatdb -p F -i fugu_exons.fas -o T
+
+We now have the following fugu database files:
+-rw-rw-r--  1 fred fred  484 Sep 10 16:25 formatdb.log
+-rw-rw-r--  1 fred fred 4.6M Sep 10 16:24 fugu_exons.fas
+-rw-rw-r--  1 fred fred 289K Sep 10 16:25 fugu_exons.fas.nhr
+-rw-rw-r--  1 fred fred  41K Sep 10 16:25 fugu_exons.fas.nin
+-rw-rw-r--  1 fred fred 405K Sep 10 16:25 fugu_exons.fas.nsd
+-rw-rw-r--  1 fred fred 7.3K Sep 10 16:25 fugu_exons.fas.nsi
+-rw-rw-r--  1 fred fred 1.2M Sep 10 16:25 fugu_exons.fas.nsq
+
+Now, we run the Blast search using our fugu exons as both the subject and query:
+blastall -p blastn -d fugu_exons.fas -i fugu_exons.fas \ 
+-e 0.05 -F F -m 9 -o fugu_fugu_blast.out
+
+This results in the following file of Fugu-Fugu Blast hits:
+-rw-rw-r--  1 fred fred  32M Sep 10 16:31 fugu_fugu_blast.out
+
+Again we use the 'blast_parser.pl' script to eliminate all but the 
+'Single-Copy' exons.  
+
+"./blast_parser.pl --infile=databases/fugu_fugu_blast.out \
+--outfile=fugu_single_copy_exons.fas \ 
+--exon_file=databases/fugu_exons.fas --min_bit_score=100"
+
+The script run provides the following statistics:
+We parsed 3483 records!!
+Wrote 1822 putative Single Copy exons to file.
+
+Again, we used the Blast bit score value to determine the relatedness
+of the exons, and we find 1822 Fugu exons that Blast did not find 
+close matches for.
+
+Now we have the output files of single-copy exons from both the Fugu and
+the Zebra fish species.  From this point, we format a Blast database using
+the Zebra single-copy exons, and do a Blast search against that database
+with the Fugu single-copy exons.
+
+The command to format the Zebra Single Copy Exon Blast database:
+[fred@snapper databases]$ formatdb -p F -i zebra_single_copy_exons.fas -o T
+
+The command to Blast Fugu Single Copy exons against the Zebra single copy:
+blastall -p blastn -d zebra_single_copy_exons.fas \
+-i fugu_single_copy_exons.fas -e 1 -F F -m 9 -o fugu_zebra_blast.out
+
+The resulting output file:
+-rw-rw-r--  1 fred fred 3.2M Sep 11 09:06 fugu_zebra_blast.out
+
+
+
+
+
+
+
+
+

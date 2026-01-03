@@ -69,7 +69,7 @@ if( $infile )
 
     my $temp_outfile_name = $outfile;
 
-    $outfile = ">". $path . substr($temp_outfile_name,0,40) . ".fas";
+    $outfile = ">". $path . substr($temp_outfile_name,0,40); # . ".fas";
     open(OUTPUT,$outfile) || die "Can't open the output file $outfile: $! \n";
 }
 
